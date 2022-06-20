@@ -2,6 +2,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const config = require('config');
 
+const usersRouter = require('./routes/users.routes');
+
 const corsMiddleware = require('./middleware/cors.middleware');
 const PORT = config.get('serverPort');
 const URL_DB = config.get('dbUrl');
@@ -10,6 +12,7 @@ const app = express();
 app.use(corsMiddleware);
 app.use(express.json());
 app.use(express.static('static'));
+app.use('/api', usersRouter);
 
 const start = async () => {
   try {
