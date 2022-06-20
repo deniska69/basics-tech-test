@@ -8,6 +8,9 @@ const authMiddleware = require('../middleware/auth.middleware');
 
 const User = require('../models/User');
 
+const SECRET_KEY = config.get('secretKey');
+const URL_DB = config.get('dbUrl');
+
 router.post(
   '/registration',
   [
@@ -28,7 +31,6 @@ router.post(
       const errors = validationResult(req);
 
       if (!errors.isEmpty()) {
-        console.log('\nОшибка регистрации:\n', errors.errors);
         return res.status(400).json({ message: 'Ошибка регистрации. Проверьте поля на корректность заполнения.', errors });
       }
 
@@ -68,7 +70,7 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Неверный пароль' });
     }
 
-    const token = jwt.sign({ id: user.id }, config.get('secretKey'), { expiresIn: '1h' });
+    const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
 
     return res.json({
       token,
@@ -81,6 +83,26 @@ router.post('/login', async (req, res) => {
     });
   } catch (e) {
     res.status(400).send({ message: 'Error: api/login' });
+  }
+});
+
+router.get('/auth', authMiddleware, async (req, res) => {
+  try {
+    const user = await User.findOne({ _id: req.user.id });
+
+    const token = jwt.sign({ id: user.id }, SECRET_KEY, { expiresIn: '1h' });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+      },
+    });
+  } catch (e) {
+    res.status(400).send({ message: 'Error: api/auth' });
   }
 });
 
