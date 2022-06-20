@@ -1,0 +1,7 @@
+{
+  "serverPort": 3001,
+  "dbUrl": "mongodb://localhost:27017/basics_tech_test",
+  "secretKey": "basics_tech_test-secket-key",
+  "staticPath": "C:\\Dev\\basics-tech-test\\server\\static",
+  "wwwUrl": "http://localhost:3000/"
+}
