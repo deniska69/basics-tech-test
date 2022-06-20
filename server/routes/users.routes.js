@@ -52,4 +52,36 @@ router.post(
   }
 );
 
+router.post('/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return res.status(404).json({ message: `Пользователь с эл.почтой ${email} не найден.` });
+    }
+
+    const isPassValid = bcrypt.compareSync(password, user.password);
+
+    if (!isPassValid) {
+      return res.status(400).json({ message: 'Неверный пароль' });
+    }
+
+    const token = jwt.sign({ id: user.id }, config.get('secretKey'), { expiresIn: '1h' });
+
+    return res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        avatar: user.avatar,
+      },
+    });
+  } catch (e) {
+    res.status(400).send({ message: 'Error: api/login' });
+  }
+});
+
 module.exports = router;
