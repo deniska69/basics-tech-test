@@ -26,7 +26,7 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import './Home.css';
 
 import { useDispatch } from 'react-redux';
-import { registration } from '../actions/users';
+import { registration, login } from '../actions/users';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -45,6 +45,8 @@ TabPanel.propTypes = {
 };
 
 export default function Home() {
+  const dispatch = useDispatch();
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -80,6 +82,10 @@ export default function Home() {
 
   const registrationNow = () => {
     registration(email, password, name, dateBirth, gender === 'М' ? 'male' : 'female');
+  };
+
+  const loginNow = () => {
+    dispatch(login(email, password));
   };
 
   return (
@@ -212,7 +218,7 @@ export default function Home() {
               </Grid>
 
               <Grid item xs={12} display={'flex'} justifyContent={'center'}>
-                <Button variant="contained" size="large">
+                <Button variant="contained" size="large" onClick={loginNow}>
                   Войти
                 </Button>
               </Grid>
