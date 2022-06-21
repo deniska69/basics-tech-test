@@ -15,13 +15,14 @@ import {
   Box,
   Button,
   TextField,
+  styled,
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ruLocale from 'date-fns/locale/ru';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import PropTypes from 'prop-types';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff, AddAPhoto, NoPhotography } from '@mui/icons-material';
 
 import './Home.css';
 
@@ -44,6 +45,10 @@ TabPanel.propTypes = {
   value: PropTypes.number.isRequired,
 };
 
+const Input = styled('input')({
+  display: 'none',
+});
+
 export default function Home() {
   const dispatch = useDispatch();
 
@@ -52,6 +57,8 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [dateBirth, setDateBirth] = useState(new Date());
   const [gender, setGender] = useState('');
+  const [photo, setPhoto] = useState('');
+  const [isPhoto, setIsPhoto] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
   const [configInputPassword, setConfigInputPassword] = useState({
@@ -86,6 +93,28 @@ export default function Home() {
 
   const loginNow = () => {
     dispatch(login(email, password));
+  };
+
+  const addPhoto = e => {
+    const file = e.target.files[0];
+    const isImage = file.type === 'image/jpg' || file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isImage) {
+      return alert('Пожалуйста, загрузите изображение');
+    }
+
+    const mb = 2;
+    if (file.size / 1024 / 1024 > mb) {
+      return alert('Пожалуйста, выберите изображение размером менее ' + mb + ' Мбайт');
+    }
+
+    setPhoto(file);
+    setIsPhoto(true);
+    e.target.value = '';
+  };
+
+  const removePhoto = () => {
+    setPhoto('');
+    setIsPhoto(false);
   };
 
   return (
@@ -127,7 +156,11 @@ export default function Home() {
                     }}
                     endAdornment={
                       <InputAdornment position="end">
-                        <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} edge="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end">
                           {configInputPassword.showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
@@ -137,17 +170,22 @@ export default function Home() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <FormControl fullWidth>
                   <InputLabel id="demo-simple-select-label">Пол:</InputLabel>
-                  <Select labelId="demo-simple-select-label" id="demo-simple-select" value={gender} label="Пол" onChange={e => setGender(e.target.value)}>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={gender}
+                    label="Пол"
+                    onChange={e => setGender(e.target.value)}>
                     <MenuItem value={'М'}>М</MenuItem>
                     <MenuItem value={'Ж'}>Ж</MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
 
-              <Grid item xs={6}>
+              <Grid item xs={5}>
                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
                   <DesktopDatePicker
                     label="Дата рождения"
@@ -158,6 +196,21 @@ export default function Home() {
                     renderInput={params => <TextField {...params} />}
                   />
                 </LocalizationProvider>
+              </Grid>
+
+              <Grid item xs={1}>
+                {!isPhoto ? (
+                  <label htmlFor="icon-button-file">
+                    <Input accept="image/*" id="icon-button-file" type="file" onChange={e => addPhoto(e)} />
+                    <IconButton color="primary" aria-label="add photo" component="span">
+                      <AddAPhoto sx={{ fontSize: '2.5rem' }} />
+                    </IconButton>
+                  </label>
+                ) : (
+                  <IconButton color="error" aria-label="delete photo" onClick={removePhoto}>
+                    <NoPhotography sx={{ fontSize: '2.5rem' }} />
+                  </IconButton>
+                )}
               </Grid>
 
               <Grid item xs={12} display={'flex'} justifyContent={'center'}>
@@ -207,7 +260,11 @@ export default function Home() {
                     }}
                     endAdornment={
                       <InputAdornment position="end">
-                        <IconButton aria-label="toggle password visibility" onClick={handleClickShowPassword} onMouseDown={handleMouseDownPassword} edge="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={handleClickShowPassword}
+                          onMouseDown={handleMouseDownPassword}
+                          edge="end">
                           {configInputPassword.showPassword ? <VisibilityOff /> : <Visibility />}
                         </IconButton>
                       </InputAdornment>
