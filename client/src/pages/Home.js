@@ -14,7 +14,12 @@ import {
   Grid,
   Box,
   Button,
+  TextField,
 } from '@mui/material';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import ruLocale from 'date-fns/locale/ru';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import PropTypes from 'prop-types';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 //import { Link } from 'react-router-dom';
@@ -40,8 +45,7 @@ export default function Home() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  // eslint-disable-next-line
-  const [dateBirth, setDateBirth] = useState('');
+  const [dateBirth, setDateBirth] = useState(new Date());
   const [gender, setGender] = useState('');
 
   const [tabIndex, setTabIndex] = useState(0);
@@ -122,7 +126,7 @@ export default function Home() {
                 </FormControl>
               </Grid>
 
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <FormControl fullWidth>
                   <InputLabel id="demo-simple-select-label">Пол:</InputLabel>
                   <Select labelId="demo-simple-select-label" id="demo-simple-select" value={gender} label="Пол" onChange={e => setGender(e.target.value)}>
@@ -130,6 +134,19 @@ export default function Home() {
                     <MenuItem value={'Ж'}>Ж</MenuItem>
                   </Select>
                 </FormControl>
+              </Grid>
+
+              <Grid item xs={6}>
+                <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ruLocale}>
+                  <DesktopDatePicker
+                    label="Дата рождения"
+                    inputFormat="dd/MM/yyyy"
+                    value={dateBirth}
+                    onChange={setDateBirth}
+                    width="100%"
+                    renderInput={params => <TextField {...params} />}
+                  />
+                </LocalizationProvider>
               </Grid>
 
               <Grid item xs={12} display={'flex'} justifyContent={'center'}>
