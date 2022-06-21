@@ -39,3 +39,18 @@ export const login = (email, password) => {
     }
   };
 };
+
+export const auth = () => {
+  return async dispatch => {
+    try {
+      const response = await axios.get(`${API_URL}api/auth`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+      dispatch(setUserCurrentAuth(response.data.user));
+      localStorage.setItem('token', response.data.token);
+    } catch (e) {
+      localStorage.removeItem('token');
+      console.log('error', e.response.data.message);
+    }
+  };
+};
