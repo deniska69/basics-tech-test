@@ -190,7 +190,6 @@ router.put('/deleteAvatar', authMiddleware, async (req, res) => {
     const { id } = req.user;
     const user = await User.findOne({ _id: id });
 
-    console.log(config.get('staticPath') + '\\avatars\\' + user.avatar);
     if (fs.existsSync(config.get('staticPath') + '\\avatars\\' + user.avatar)) {
       fs.unlinkSync(config.get('staticPath') + '\\avatars\\' + user.avatar);
     }
@@ -200,8 +199,25 @@ router.put('/deleteAvatar', authMiddleware, async (req, res) => {
 
     return res.json({ message: 'Аватар успешно удалён.', user });
   } catch (e) {
-    console.log(e);
     res.status(400).send({ message: 'Error: api/deleteAvatar' });
+  }
+});
+
+router.put('/uploadAvatar', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await User.findOne({ _id: id });
+
+    const file = req.files.file;
+    const fileName = Uuid.v4() + '.jpg';
+    file.mv(config.get('staticPath') + '\\avatars\\' + fileName);
+
+    user.avatar = fileName;
+    await user.save();
+
+    return res.json({ message: 'Аватар успешно обновлён.', user });
+  } catch (e) {
+    res.status(400).send({ message: 'Error: api/uploadAvatar' });
   }
 });
 

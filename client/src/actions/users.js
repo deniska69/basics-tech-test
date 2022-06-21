@@ -82,6 +82,25 @@ export const deleteAvatar = () => {
       dispatch(setUserCurrentAuth(response.data.user));
       console.log(response.data.message);
     } catch (e) {
+      console.log(e);
+      console.log(e.response.data.message);
+    }
+  };
+};
+
+export const uploadAvatar = file => {
+  return async dispatch => {
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await axios.put(`${API_URL}api/uploadAvatar`, formData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+
+      dispatch(setUserCurrentAuth(response.data.user));
+      console.log(response.data.message);
+    } catch (e) {
       console.log(e.response.data.message);
     }
   };

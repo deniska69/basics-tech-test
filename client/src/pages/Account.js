@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 
 import {
@@ -27,7 +27,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { Visibility, VisibilityOff, NoPhotography, AddAPhoto } from '@mui/icons-material';
 
 import { useDispatch } from 'react-redux';
-import { updateProfile, deleteAvatar } from '../actions/users';
+import { updateProfile, deleteAvatar, uploadAvatar } from '../actions/users';
 
 import { API_URL } from '../config';
 import avatarDefault from '../assets/avatarDefault.jpg';
@@ -40,8 +40,13 @@ const Item = styled(Paper)(({ theme }) => ({
   color: theme.palette.text.secondary,
 }));
 
+const Input = styled('input')({
+  display: 'none',
+});
+
 export default function Account() {
   const dispatch = useDispatch();
+
   const currentUser = useSelector(state => state.user.currentUser);
 
   const [name, setName] = useState(currentUser.name);
@@ -49,8 +54,12 @@ export default function Account() {
   const [password, setPassword] = useState('');
   const [dateBirth, setDateBirth] = useState(currentUser.date_of_birth);
   const [gender, setGender] = useState(currentUser.gender === 'male' ? 'М' : 'Ж');
-  // eslint-disable-next-line
   const [avatar, setAvatar] = useState(currentUser.avatar);
+
+  useEffect(() => {
+    setAvatar(currentUser.avatar);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser]);
 
   const [configInputPassword, setConfigInputPassword] = useState({
     showPassword: false,
@@ -71,6 +80,26 @@ export default function Account() {
     dispatch(updateProfile(email, password, name, dateBirth, gender === 'М' ? 'male' : 'female'));
   };
 
+  const deleteAvatarNow = () => {
+    dispatch(deleteAvatar());
+  };
+
+  const uploadAvatarNow = e => {
+    const file = e.target.files[0];
+    const isImage = file.type === 'image/jpg' || file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isImage) {
+      return alert('Пожалуйста, загрузите изображение. (JPG/JPEG/PNG)');
+    }
+
+    const mb = 2;
+    if (file.size / 1024 / 1024 > mb) {
+      return alert('Пожалуйста, выберите изображение размером менее ' + mb + ' Мбайт');
+    }
+
+    dispatch(uploadAvatar(file));
+    e.target.value = '';
+  };
+
   return (
     <Container maxWidth="md">
       <Box sx={{ flexGrow: 1, minHeight: '100vh', paddingTop: '10vh' }}>
@@ -80,17 +109,15 @@ export default function Account() {
               <CardMedia component="img" height={'100%'} image={avatar === '' ? avatarDefault : `${API_URL + '\\avatars\\' + avatar}`} alt="Avatar" />
             </Card>
             <Stack direction="row" spacing={2} sx={{ marginTop: '1rem' }}>
-              <Button
-                variant="contained"
-                color="error"
-                startIcon={<NoPhotography />}
-                disabled={avatar === '' && true}
-                onClick={dispatch(deleteAvatar)}>
+              <Button variant="contained" color="error" startIcon={<NoPhotography />} onClick={() => deleteAvatarNow()}>
                 Удалить
               </Button>
-              <Button variant="contained" color="info" endIcon={<AddAPhoto />}>
-                Изменить
-              </Button>
+              <label htmlFor="contained-button-file">
+                <Input accept="image/*" id="contained-button-file" multiple type="file" onChange={e => uploadAvatarNow(e)} />
+                <Button variant="contained" component="span" color="info" endIcon={<AddAPhoto />}>
+                  Изменить
+                </Button>
+              </label>
             </Stack>
           </Grid>
           <Grid item xs={8}>
