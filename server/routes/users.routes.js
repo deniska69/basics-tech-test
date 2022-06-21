@@ -85,6 +85,8 @@ router.post('/login', async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
+        date_of_birth: user.date_of_birth,
+        gender: user.gender,
         avatar: user.avatar,
       },
     });
@@ -107,6 +109,7 @@ router.get('/auth', authMiddleware, async (req, res) => {
         name: user.name,
         date_of_birth: user.date_of_birth,
         gender: user.gender,
+        avatar: user.avatar,
       },
     });
   } catch (e) {
@@ -179,6 +182,26 @@ router.put('/updateProfile', authMiddleware, async (req, res) => {
     return res.json({ message: `Данные профиля успешно обновлены.`, user });
   } catch (e) {
     res.status(400).send({ message: 'Error: api/updateUser' });
+  }
+});
+
+router.put('/deleteAvatar', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.user;
+    const user = await User.findOne({ _id: id });
+
+    console.log(config.get('staticPath') + '\\avatars\\' + user.avatar);
+    if (fs.existsSync(config.get('staticPath') + '\\avatars\\' + user.avatar)) {
+      fs.unlinkSync(config.get('staticPath') + '\\avatars\\' + user.avatar);
+    }
+
+    user.avatar = '';
+    await user.save();
+
+    return res.json({ message: 'Аватар успешно удалён.', user });
+  } catch (e) {
+    console.log(e);
+    res.status(400).send({ message: 'Error: api/deleteAvatar' });
   }
 });
 

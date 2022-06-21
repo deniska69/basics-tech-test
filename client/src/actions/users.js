@@ -71,3 +71,18 @@ export const updateProfile = (email, password, name, date_of_birth, gender) => {
     }
   };
 };
+
+export const deleteAvatar = () => {
+  return async dispatch => {
+    try {
+      const response = await axios.put(`${API_URL}api/deleteAvatar`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+
+      dispatch(setUserCurrentAuth(response.data.user));
+      console.log(response.data.message);
+    } catch (e) {
+      console.log(e.response.data.message);
+    }
+  };
+};

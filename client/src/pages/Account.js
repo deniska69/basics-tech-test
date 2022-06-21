@@ -16,15 +16,21 @@ import {
   TextField,
   Paper,
   styled,
+  Card,
+  CardMedia,
+  Stack,
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ruLocale from 'date-fns/locale/ru';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { Visibility, VisibilityOff, NoPhotography, AddAPhoto } from '@mui/icons-material';
 
 import { useDispatch } from 'react-redux';
-import { updateProfile } from '../actions/users';
+import { updateProfile, deleteAvatar } from '../actions/users';
+
+import { API_URL } from '../config';
+import avatarDefault from '../assets/avatarDefault.jpg';
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -43,6 +49,8 @@ export default function Account() {
   const [password, setPassword] = useState('');
   const [dateBirth, setDateBirth] = useState(currentUser.date_of_birth);
   const [gender, setGender] = useState(currentUser.gender === 'male' ? 'М' : 'Ж');
+  // eslint-disable-next-line
+  const [avatar, setAvatar] = useState(currentUser.avatar);
 
   const [configInputPassword, setConfigInputPassword] = useState({
     showPassword: false,
@@ -68,7 +76,22 @@ export default function Account() {
       <Box sx={{ flexGrow: 1, minHeight: '100vh', paddingTop: '10vh' }}>
         <Grid container spacing={2}>
           <Grid item xs={4}>
-            <Item>Тут будет Аватар</Item>
+            <Card>
+              <CardMedia component="img" height={'100%'} image={avatar === '' ? avatarDefault : `${API_URL + '\\avatars\\' + avatar}`} alt="Avatar" />
+            </Card>
+            <Stack direction="row" spacing={2} sx={{ marginTop: '1rem' }}>
+              <Button
+                variant="contained"
+                color="error"
+                startIcon={<NoPhotography />}
+                disabled={avatar === '' && true}
+                onClick={dispatch(deleteAvatar)}>
+                Удалить
+              </Button>
+              <Button variant="contained" color="info" endIcon={<AddAPhoto />}>
+                Изменить
+              </Button>
+            </Stack>
           </Grid>
           <Grid item xs={8}>
             <Item>
