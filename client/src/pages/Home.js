@@ -22,8 +22,11 @@ import ruLocale from 'date-fns/locale/ru';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import PropTypes from 'prop-types';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-//import { Link } from 'react-router-dom';
+
 import './Home.css';
+
+import { useDispatch } from 'react-redux';
+import { registration } from '../actions/users';
 
 function TabPanel(props) {
   const { children, value, index, ...other } = props;
@@ -47,14 +50,9 @@ export default function Home() {
   const [password, setPassword] = useState('');
   const [dateBirth, setDateBirth] = useState(new Date());
   const [gender, setGender] = useState('');
-
   const [tabIndex, setTabIndex] = useState(0);
 
   const [configInputPassword, setConfigInputPassword] = useState({
-    amount: '',
-    password: '',
-    weight: '',
-    weightRange: '',
     showPassword: false,
   });
 
@@ -70,11 +68,18 @@ export default function Home() {
   };
 
   const selectTab = () => {
+    setEmail('');
+    setPassword('');
+
     if (tabIndex === 0) {
       setTabIndex(1);
     } else if (tabIndex === 1) {
       setTabIndex(0);
     }
+  };
+
+  const registrationNow = () => {
+    registration(email, password, name, dateBirth, gender === 'М' ? 'male' : 'female');
   };
 
   return (
@@ -150,7 +155,7 @@ export default function Home() {
               </Grid>
 
               <Grid item xs={12} display={'flex'} justifyContent={'center'}>
-                <Button variant="contained" size="large">
+                <Button variant="contained" size="large" onClick={registrationNow}>
                   Зарегистрироваться
                 </Button>
               </Grid>
