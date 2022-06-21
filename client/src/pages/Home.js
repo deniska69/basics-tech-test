@@ -88,7 +88,7 @@ export default function Home() {
   };
 
   const registrationNow = () => {
-    registration(email, password, name, dateBirth, gender === 'М' ? 'male' : 'female');
+    registration(email, password, name, dateBirth, gender === 'М' ? 'male' : 'female', photo);
   };
 
   const loginNow = () => {
@@ -99,7 +99,7 @@ export default function Home() {
     const file = e.target.files[0];
     const isImage = file.type === 'image/jpg' || file.type === 'image/jpeg' || file.type === 'image/png';
     if (!isImage) {
-      return alert('Пожалуйста, загрузите изображение');
+      return alert('Пожалуйста, загрузите изображение. (JPG/JPEG/PNG)');
     }
 
     const mb = 2;

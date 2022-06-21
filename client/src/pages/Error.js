@@ -1,4 +1,4 @@
-import { Container, Card, CardContent, Typography } from '@mui/material';
+import { Container, Card, CardContent, Alert } from '@mui/material';
 import { Link } from 'react-router-dom';
 
 export default function Error() {
@@ -6,9 +6,9 @@ export default function Error() {
     <Container maxWidth="sm">
       <Card width="sm" sx={{ xs: 2, md: 3 }}>
         <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Typography variant="h5" align="center" marginBottom={'3vh'}>
-            Ошибка 404 - такой страницы не существует!
-          </Typography>
+          <Alert severity="error" sx={{ marginBottom: '2vh' }}>
+            Ошибка! Такой страницы не существует, или у вас нет доступа для просмотра.
+          </Alert>
           <Link to="/">Вернуться на главную страницу</Link>
         </CardContent>
       </Card>

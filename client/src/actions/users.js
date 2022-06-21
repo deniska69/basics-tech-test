@@ -3,15 +3,15 @@ import { setUserCurrentAuth } from '../reducers/userReducer';
 import { API_URL } from '../config';
 import { WWW_URL } from '../config';
 
-export const registration = async (email, password, name, date_of_birth, gender) => {
+export const registration = async (email, password, name, date_of_birth, gender, avatar) => {
   try {
-    const response = await axios.post(`${API_URL}api/registration`, {
-      email,
-      password,
-      name,
-      date_of_birth,
-      gender,
-    });
+    const formData = new FormData();
+    formData.append('file', avatar);
+
+    const response = await axios.post(
+      `${API_URL}api/registration?email=${email}&password=${password}&name=${name}&date_of_birth=${date_of_birth}&gender=${gender}`,
+      formData
+    );
 
     console.log(response.data.message);
   } catch (e) {

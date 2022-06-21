@@ -6,6 +6,8 @@ const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const authMiddleware = require('../middleware/auth.middleware');
 const mongoose = require('mongoose');
+const fs = require('fs');
+const Uuid = require('uuid');
 
 const User = require('../models/User');
 
@@ -28,13 +30,13 @@ router.post(
 
   async (req, res) => {
     try {
-      const errors = validationResult(req);
+      const errors = validationResult(req.query);
 
       if (!errors.isEmpty()) {
         return res.status(400).json({ message: 'Ошибка регистрации. Проверьте поля на корректность заполнения.', errors });
       }
 
-      const { email, password, name, date_of_birth, gender } = req.body;
+      const { email, password, name, date_of_birth, gender } = req.query;
 
       const candidate = await User.findOne({ email });
 
@@ -43,7 +45,12 @@ router.post(
       }
 
       const hashPassword = await bcrypt.hash(password, 8);
-      const user = new User({ email, password: hashPassword, name, date_of_birth, gender });
+
+      const file = req.files.file;
+      const fileName = Uuid.v4() + '.jpg';
+      file.mv(config.get('staticPath') + '\\avatars\\' + fileName);
+
+      const user = new User({ email, password: hashPassword, name, date_of_birth, gender, avatar: fileName });
 
       await user.save();
 
