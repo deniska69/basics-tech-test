@@ -9,7 +9,6 @@ const authMiddleware = require('../middleware/auth.middleware');
 const User = require('../models/User');
 
 const SECRET_KEY = config.get('secretKey');
-const URL_DB = config.get('dbUrl');
 
 router.post(
   '/registration',
@@ -103,6 +102,17 @@ router.get('/auth', authMiddleware, async (req, res) => {
     });
   } catch (e) {
     res.status(400).send({ message: 'Error: api/auth' });
+  }
+});
+
+router.get('/allUsers', authMiddleware, async (req, res) => {
+  try {
+    console.log(req.user.id);
+    const users = await User.find({ _id: { $ne: req.user.id } });
+
+    return res.json({ users });
+  } catch (e) {
+    res.status(400).send({ message: 'Error: api/allUsers' });
   }
 });
 
