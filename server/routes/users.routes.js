@@ -107,12 +107,25 @@ router.get('/auth', authMiddleware, async (req, res) => {
 
 router.get('/allUsers', authMiddleware, async (req, res) => {
   try {
-    console.log(req.user.id);
-    const users = await User.find({ _id: { $ne: req.user.id } });
+    const users = await User.find(
+      { _id: { $ne: req.user.id } },
+      {
+        avatar: 1,
+        name: 1,
+        date_of_birth: 1,
+        dateDifference1: { $toDate: [{ $subtract: ['$$NOW', '$date_of_birth'] }] },
+        dateDifference2: { $dateToParts: { date: '$date_of_birth' } },
+        birthYear1: { $dateToString: { format: '%Y', date: '$date_of_birth' } },
+        birthYear2: { $dateToString: { format: '%Y', date: '$$NOW' } },
+        age: { $subtract: [{ $toDecimal: { $dateToString: { format: '%Y', date: '$$NOW' } } }, { $toDecimal: { $dateToString: { format: '%Y', date: '$date_of_birth' } } }] },
+      }
+    );
 
     return res.json({ users });
   } catch (e) {
-    res.status(400).send({ message: 'Error: api/allUsers' });
+    console.log(e);
+    //res.status(400).send({ message: 'Error: api/allUsers' });
+    res.status(400).send({ message: e });
   }
 });
 
