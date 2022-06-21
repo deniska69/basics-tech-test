@@ -1,20 +1,29 @@
-const jwt = require("jsonwebtoken");
-const config = require("config");
+const jwt = require('jsonwebtoken');
+const config = require('config');
 
 module.exports = (req, res, next) => {
-  if (req.method === "OPTIONS") {
+  if (req.method === 'OPTIONS') {
     return next();
   }
 
   try {
-    const token = req.headers.authorization.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ message: "Ошибка аутентификации: 401" });
+    try {
+      const token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, config.get('secretKey'));
+      req.user = decoded;
+      next();
+    } catch {
+      try {
+        const token = req.body.headers.Authorization.split(' ')[1];
+        const decoded = jwt.verify(token, config.get('secretKey'));
+        req.user = decoded;
+        next();
+      } catch {
+        return res.status(401).json({ message: 'Ошибка аутентификации: отсутствует токен.' });
+      }
     }
-    const decoded = jwt.verify(token, config.get("secretKey"));
-    req.user = decoded;
-    next();
   } catch (e) {
-    return res.status(401).json({ message: "Ошибка аутентификации: 401" });
+    console.log(e);
+    return res.status(401).json({ message: 'Ошибка аутентификации: непредвиденная ошибка.' });
   }
 };

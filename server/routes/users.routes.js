@@ -5,6 +5,7 @@ const config = require('config');
 const jwt = require('jsonwebtoken');
 const { check, validationResult } = require('express-validator');
 const authMiddleware = require('../middleware/auth.middleware');
+const mongoose = require('mongoose');
 
 const User = require('../models/User');
 
@@ -97,7 +98,8 @@ router.get('/auth', authMiddleware, async (req, res) => {
         id: user.id,
         email: user.email,
         name: user.name,
-        avatar: user.avatar,
+        date_of_birth: user.date_of_birth,
+        gender: user.gender,
       },
     });
   } catch (e) {
@@ -122,18 +124,47 @@ router.get('/allUsers', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/updateUser', authMiddleware, async (req, res) => {
+router.put('/updateProfile', authMiddleware, async (req, res) => {
   try {
-    const { _id, name, password } = req.body;
+    const { id } = req.user;
 
-    const user = await User.findOne({ _id: req.user.id });
+    if (!mongoose.isObjectIdOrHexString(id)) {
+      return res.status(400).json({ message: 'Ошибка в ID авторизованного пользователя.', errors });
+    }
+    const { email, password, name, date_of_birth, gender } = req.query;
 
-    if (name != '') {
-      user.name = name;
+    const user = await User.findOne({ _id: id });
+
+    if (email != '' && email != undefined) {
+      user.email = email;
+    } else {
+      return res.status(400).json({ message: 'Некоректный Email.', errors });
     }
 
-    if (password != '') {
-      user.password = await bcrypt.hash(password, 8);
+    if (password != '' && password != undefined) {
+      if (password.length > 3 && password.length < 13) {
+        user.password = await bcrypt.hash(password, 8);
+      } else {
+        return res.status(400).json({ message: 'Пароль должен быть длиннее 3 и короче 13 символов.', errors });
+      }
+    }
+
+    if (name != '' && name != undefined && name.length > 3 && name.length < 31) {
+      user.name = name;
+    } else {
+      return res.status(400).json({ message: 'Некоректное или слишком короткое имя.', errors });
+    }
+
+    if (date_of_birth != '' && date_of_birth != undefined) {
+      user.date_of_birth = date_of_birth;
+    } else {
+      return res.status(400).json({ message: 'Некоректная дата рождения.', errors });
+    }
+
+    if (gender == 'male' || gender == 'female') {
+      user.gender = gender;
+    } else {
+      return res.status(400).json({ message: 'Некоректно указан пол.', errors });
     }
 
     await user.save();
