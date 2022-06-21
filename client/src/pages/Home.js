@@ -16,13 +16,14 @@ import {
   Button,
   TextField,
   styled,
+  Tooltip,
 } from '@mui/material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import ruLocale from 'date-fns/locale/ru';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import PropTypes from 'prop-types';
-import { Visibility, VisibilityOff, AddAPhoto, NoPhotography } from '@mui/icons-material';
+import { Visibility, VisibilityOff, AddAPhoto, PhotoCameraFrontTwoTone } from '@mui/icons-material';
 
 import './Home.css';
 
@@ -199,18 +200,20 @@ export default function Home() {
               </Grid>
 
               <Grid item xs={1}>
-                {!isPhoto ? (
-                  <label htmlFor="icon-button-file">
-                    <Input accept="image/*" id="icon-button-file" type="file" onChange={e => addPhoto(e)} />
-                    <IconButton color="primary" aria-label="add photo" component="span">
-                      <AddAPhoto sx={{ fontSize: '2.5rem' }} />
+                <Tooltip title={!isPhoto ? 'Добавить фотографию' : 'Удалить фотографию'}>
+                  {!isPhoto ? (
+                    <label htmlFor="icon-button-file">
+                      <Input accept="image/*" id="icon-button-file" type="file" onChange={e => addPhoto(e)} />
+                      <IconButton color="primary" aria-label="add photo" component="span">
+                        <AddAPhoto sx={{ fontSize: '2.5rem' }} />
+                      </IconButton>
+                    </label>
+                  ) : (
+                    <IconButton color="success" aria-label="delete photo" onClick={removePhoto}>
+                      <PhotoCameraFrontTwoTone sx={{ fontSize: '2.5rem' }} />
                     </IconButton>
-                  </label>
-                ) : (
-                  <IconButton color="error" aria-label="delete photo" onClick={removePhoto}>
-                    <NoPhotography sx={{ fontSize: '2.5rem' }} />
-                  </IconButton>
-                )}
+                  )}
+                </Tooltip>
               </Grid>
 
               <Grid item xs={12} display={'flex'} justifyContent={'center'}>
