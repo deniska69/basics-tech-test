@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setUserCurrentAuth, setUserAllList } from '../reducers/userReducer';
+import { setUserCurrentAuth, setUserAllList, setUserCurrentAuthIsLogout } from '../reducers/userReducer';
 import { API_URL } from '../config';
 import { WWW_URL } from '../config';
 
@@ -117,5 +117,12 @@ export const allUsers = () => {
     } catch (e) {
       console.log(e.response.data.message);
     }
+  };
+};
+
+export const logout = () => {
+  return async dispatch => {
+    dispatch(setUserCurrentAuthIsLogout());
+    window.location.href = `${WWW_URL}`;
   };
 };

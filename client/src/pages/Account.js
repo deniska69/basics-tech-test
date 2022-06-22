@@ -27,7 +27,7 @@ import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 import { Visibility, VisibilityOff, NoPhotography, AddAPhoto } from '@mui/icons-material';
 
 import { useDispatch } from 'react-redux';
-import { updateProfile, deleteAvatar, uploadAvatar } from '../actions/users';
+import { updateProfile, deleteAvatar, uploadAvatar, logout } from '../actions/users';
 
 import { API_URL } from '../config';
 import avatarDefault from '../assets/avatarDefault.jpg';
@@ -106,7 +106,16 @@ export default function Account() {
         <Grid container spacing={2}>
           <Grid item xs={4}>
             <Card>
-              <CardMedia component="img" height={'100%'} image={avatar === '' ? avatarDefault : `${API_URL + '\\avatars\\' + avatar}`} alt="Avatar" />
+              <CardMedia
+                component="img"
+                height={'100%'}
+                image={avatar === '' ? avatarDefault : `${API_URL + '\\avatars\\' + avatar}`}
+                onError={e => {
+                  e.target.onerror = null;
+                  e.target.src = avatarDefault;
+                }}
+                alt="Avatar"
+              />
             </Card>
             <Stack direction="row" spacing={2} sx={{ marginTop: '1rem' }}>
               <Button variant="contained" color="error" startIcon={<NoPhotography />} onClick={() => deleteAvatarNow()}>
@@ -195,6 +204,12 @@ export default function Account() {
                 <Grid item xs={6} display={'flex'}>
                   <Button variant="contained" size="large" color="success" sx={{ width: '100%' }} onClick={updateProfileNow}>
                     Сохранить профиль
+                  </Button>
+                </Grid>
+
+                <Grid item xs={6} display={'flex'}>
+                  <Button variant="contained" size="large" color="warning" sx={{ width: '100%' }} onClick={() => dispatch(logout())}>
+                    Выйти
                   </Button>
                 </Grid>
               </Grid>

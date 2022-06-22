@@ -24,7 +24,7 @@ export default function Account() {
 
   return (
     <Container maxWidth="md">
-      <Box sx={{ flexGrow: 1, paddingTop: '5vh' }}>
+      <Box sx={{ flexGrow: 1, marginTop: '3vh', marginBottom: '3vh' }}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 6, sm: 10, md: 16 }}>
           {listUsers.map((user, index) => (
             <Grid item xs={2} sm={4} md={4} key={index}>
