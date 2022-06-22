@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { setUserCurrentAuth } from '../reducers/userReducer';
+import { setUserCurrentAuth, setUserAllList } from '../reducers/userReducer';
 import { API_URL } from '../config';
 import { WWW_URL } from '../config';
 
@@ -100,6 +100,20 @@ export const uploadAvatar = file => {
 
       dispatch(setUserCurrentAuth(response.data.user));
       console.log(response.data.message);
+    } catch (e) {
+      console.log(e.response.data.message);
+    }
+  };
+};
+
+export const allUsers = () => {
+  return async dispatch => {
+    try {
+      const response = await axios.get(`${API_URL}api/allUsers`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+
+      dispatch(setUserAllList(response.data.users));
     } catch (e) {
       console.log(e.response.data.message);
     }
