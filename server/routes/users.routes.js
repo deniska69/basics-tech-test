@@ -33,7 +33,7 @@ router.post(
       const errors = validationResult(req.query);
 
       if (!errors.isEmpty()) {
-        return res.status(400).json({ message: 'Ошибка регистрации. Проверьте поля на корректность заполнения.', errors });
+        return res.status(400).json({ message: 'Ошибка регистрации. Проверьте поля на корректность заполнения.' });
       }
 
       const { email, password, name, date_of_birth, gender } = req.query;
@@ -134,52 +134,57 @@ router.get('/allUsers', authMiddleware, async (req, res) => {
   }
 });
 
-router.put('/updateProfile', authMiddleware, async (req, res) => {
+router.put('/updateName', authMiddleware, async (req, res) => {
   try {
     const { id } = req.user;
 
     if (!mongoose.isObjectIdOrHexString(id)) {
-      return res.status(400).json({ message: 'Ошибка в ID авторизованного пользователя.', errors });
+      return res.status(400).json({ message: 'Ошибка в ID авторизованного пользователя.' });
     }
-    const { email, password, name, date_of_birth, gender } = req.query;
+
+    const { name } = req.query;
 
     const user = await User.findOne({ _id: id });
 
-    if (email != '' && email != undefined) {
-      user.email = email;
+    if (name != '' && name != undefined && name.length > 3 && name.length < 31) {
+      user.name = name;
     } else {
-      return res.status(400).json({ message: 'Некоректный Email.', errors });
+      return res.status(400).json({ message: 'Некоректное или слишком короткое имя.' });
     }
+
+    await user.save();
+
+    return res.json({ message: `Имя профиля успешно обновлено.`, user });
+  } catch (e) {
+    res.status(400).send({ message: 'Error: api/updateUser' });
+  }
+});
+
+router.put('/updatePassword', authMiddleware, async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    if (!mongoose.isObjectIdOrHexString(id)) {
+      return res.status(400).json({ message: 'Ошибка в ID авторизованного пользователя.' });
+    }
+
+    const { password } = req.query;
+
+    const user = await User.findOne({ _id: id });
 
     if (password != '' && password != undefined) {
       if (password.length > 3 && password.length < 13) {
         user.password = await bcrypt.hash(password, 8);
       } else {
-        return res.status(400).json({ message: 'Пароль должен быть длиннее 3 и короче 13 символов.', errors });
+        return res.status(400).json({ message: 'Пароль должен быть длиннее 3 и короче 13 символов.' });
       }
-    }
-
-    if (name != '' && name != undefined && name.length > 3 && name.length < 31) {
-      user.name = name;
     } else {
-      return res.status(400).json({ message: 'Некоректное или слишком короткое имя.', errors });
-    }
-
-    if (date_of_birth != '' && date_of_birth != undefined) {
-      user.date_of_birth = date_of_birth;
-    } else {
-      return res.status(400).json({ message: 'Некоректная дата рождения.', errors });
-    }
-
-    if (gender == 'male' || gender == 'female') {
-      user.gender = gender;
-    } else {
-      return res.status(400).json({ message: 'Некоректно указан пол.', errors });
+      return res.status(400).json({ message: 'Ошибка: необходимо ввести пароль.' });
     }
 
     await user.save();
 
-    return res.json({ message: `Данные профиля успешно обновлены.`, user });
+    return res.json({ message: `Пароль успешно обновлён.`, user });
   } catch (e) {
     res.status(400).send({ message: 'Error: api/updateUser' });
   }

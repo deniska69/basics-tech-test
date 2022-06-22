@@ -1,21 +1,13 @@
 import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
-
+import { useSelector, useDispatch } from 'react-redux';
 import { Container, Box, Grid, Card, CardContent, CardMedia, Typography } from '@mui/material';
-
 import { allUsers } from '../actions/users';
-// eslint-disable-next-line
 import { API_URL } from '../config';
-// eslint-disable-next-line
 import avatarDefault from '../assets/avatarDefault.jpg';
 
 export default function Account() {
-  // eslint-disable-next-line
   const dispatch = useDispatch();
-  // eslint-disable-next-line
   const listUsers = useSelector(state => state.user.listUsers);
-  //console.log(listUsers);
 
   useEffect(() => {
     dispatch(allUsers());
