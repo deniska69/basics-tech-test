@@ -1,4 +1,4 @@
-### Тестовое задание на позицию:
+### Test task for the position:
 
 ### "Middle Fullstack Developer React.js/Node.js"
 
